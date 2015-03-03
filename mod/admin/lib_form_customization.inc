@@ -19,25 +19,25 @@ function form_customization_get_reset_fields() {
 function form_customization_reset_all($entity) {
     global $global;
     $entity = $global['db']->qstr($entity);
-    $sql = "UPDATE data_dict AS N JOIN data_dict_original AS O ON N.field_number = O.field_number 
-          SET 
-            N.field_label = O.field_label , 
-            N.field_type = O.field_type,  
-            N.datatype = O.datatype , 
-            N.label_number = O.label_number ,  
+    $sql = "UPDATE data_dict AS N JOIN data_dict_original AS O ON N.field_number = O.field_number
+          SET
+            N.field_label = O.field_label ,
+            N.field_type = O.field_type,
+            N.datatype = O.datatype ,
+            N.label_number = O.label_number ,
             N.list_code = O.list_code ,
-            N.is_repeat = O.is_repeat ,  
-            N.clar_note = O.clar_note ,   
-            N.field_name = O.field_name ,  
-            N.entity = O.entity ,    
-            N.find = O.find ,    
-            N.essential =O.essential ,   
-            N.visible_new = O.visible_new , 
-            N.visible_view = O.visible_view, 
-            N.validation = O.validation ,  
-            N.required = O.required , 
-            N.visible_browse = O.visible_browse  , 
-            N.visible_search = O.visible_search , 
+            N.is_repeat = O.is_repeat ,
+            N.clar_note = O.clar_note ,
+            N.field_name = O.field_name ,
+            N.entity = O.entity ,
+            N.find = O.find ,
+            N.essential =O.essential ,
+            N.visible_new = O.visible_new ,
+            N.visible_view = O.visible_view,
+            N.validation = O.validation ,
+            N.required = O.required ,
+            N.visible_browse = O.visible_browse  ,
+            N.visible_search = O.visible_search ,
             N.visible_search_display = O.visible_search_display
           WHERE O.entity=$entity";
 
@@ -49,51 +49,7 @@ function form_customization_reset_all($entity) {
 }
 
 function form_customization_get_field_table($entity) {
-    switch ($entity) {
-        case 'person':
-            $res = Browse::getFields('person');
-            break;
-        case 'event':
-            $res = Browse::getFields('event');
-            break;
-        case 'act':
-            $res = Browse::getFields('act');
-            break;
-        case 'arrest':
-            $res = Browse::getFields('arrest');
-            break;
-        case 'killing':
-            $res = Browse::getFields('killing');
-            break;
-        case 'destruction':
-            $res = Browse::getFields('destruction');
-            break;
-        case 'torture':
-            $res = Browse::getFields('torture');
-            break;
-        case 'chain_of_events':
-            $res = Browse::getFields('chain_of_events');
-            break;
-        case 'involvement':
-            $res = Browse::getFields('involvement');
-            break;
-        case 'information':
-            $res = Browse::getFields('information');
-            break;
-        case 'intervention':
-            $res = Browse::getFields('intervention');
-            break;
-        case 'biographic_details':
-            $res = Browse::getFields('biographic_details');
-            break;
-        case 'supporting_docs_meta':
-            $res = Browse::getFields('supporting_docs_meta');
-            break;
-        case 'address':
-            $res = Browse::getFields('address');
-            break;
-    }
-    return $res;
+    return Browse::getFields($entity);
 }
 
 function form_customization_reset_field($entity, $field) {
@@ -101,9 +57,9 @@ function form_customization_reset_field($entity, $field) {
     //var_dump($entity);
     $field = addslashes_deep($field);
     $entity = $global['db']->qstr($entity);
-    $sql = "Update data_dict as N join data_dict_original as O 
-                ON N.field_number = O.field_number 
-                SET N.$field = O.$field 
+    $sql = "Update data_dict as N join data_dict_original as O
+                ON N.field_number = O.field_number
+                SET N.$field = O.$field
                 where O.entity=$entity";
     //$global['db']->debug = true;
     $res = $global['db']->Execute($sql);
@@ -121,7 +77,7 @@ function form_customization_process_entity_form($entity) {
     include_once(APPROOT . 'inc/i18n/lib_l10n.inc');
     $locales = l10n_get_locals();
 
-    
+
 
     foreach ($records as $record) {
         $fieldValues = array();
@@ -198,16 +154,16 @@ function form_customization_process_entity_form($entity) {
                 //var_dump($e,$sql);
             }
         }
-        
+
         if (isset($_POST['visibility_field_' . $recordNumber]) && isset($_POST['visibility_field_' . $recordNumber . '_vals'])) {
             $field_number2 = $_POST['visibility_field_' . $recordNumber];
             $field_number2 = $global['db']->qstr($field_number2);
-            
+
             $vals = $_POST['visibility_field_' . $recordNumber . '_vals'];
             if(!is_array($vals)){
                 $vals = array($vals);
             }
-            
+
             $sql = "INSERT INTO data_dict_visibility (`field_number`,`field_number2`,`value`) values ";
             $sql2 = array();
             foreach($vals as $val){
@@ -288,10 +244,10 @@ function form_customization_add_field($field_type_options) {
         $fieldValues[$k] = $v;
     }
     $fieldValues['field_label'] = addslashes($_POST['field_label']);
-    
+
     $fieldValues['field_name'] = str_replace(" ", "", $fieldValues['field_name']);
     $fieldValues['field_name'] = str_replace("-", "_", $fieldValues['field_name']);
-    
+
     switch ($fieldValues['field_type']) {
         case 'text':
             $field_mysql_type = "VARCHAR(250)";
@@ -341,13 +297,22 @@ function form_customization_add_field($field_type_options) {
             $fieldValues['is_repeat'] = 'y';
             $fieldValues['field_type'] = 'user_select';
             break;
-         case 'line' :
+        case 'subformat':
+            $field_mysql_type = "VARCHAR(14)";
+            $fieldValues['visible_browse'] = 'n';
+            $fieldValues['visible_adv_search'] = 'y';
+            $fieldValues['visible_adv_search_display'] = 'y';
+            $fieldValues['is_repeat'] = 'y';
+            $fieldValues['required'] = 'n';
+            $fieldValues['field_type'] = 'subformat';
+            break;
+        case 'line' :
             $fieldValues['visible_browse'] = 'n';
             $fieldValues['visible_adv_search'] = 'n';
             $fieldValues['visible_adv_search_display'] = 'n';
             $fieldValues['required'] = 'n';
             $fieldValues['clar_note'] = 'n';
-    
+
             break;
     }
     $fieldValues['visible_edit'] = $fieldValues['visible_new'];
@@ -389,7 +354,34 @@ function form_customization_add_field($field_type_options) {
         if ($fieldValues['field_type'] == "location") {
             $dbQuery->ExecuteNonQuery("ALTER TABLE `" . $fieldValues['entity'] . "` ADD `" . $fieldValues['field_name'] . "_latitude` double NULL ");
             $dbQuery->ExecuteNonQuery("ALTER TABLE `" . $fieldValues['entity'] . "` ADD `" . $fieldValues['field_name'] . "_longitude` double NULL ");
-        }if (($fieldValues['field_type'] == "mt_tree" || $fieldValues['field_type'] == "mt_select") && $fieldValues['is_repeat'] == 'y') {
+        }
+        if($fieldValues['field_type'] == "subformat"){
+          $create_entity_table = "CREATE  TABLE IF NOT EXISTS  `" . $fieldValues['field_name'] . "` (
+                  `vocab_number` varchar(14) NOT NULL,
+                  PRIMARY KEY (`vocab_number`)
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+          $dbQuery->ExecuteNonQuery($create_entity_table);
+
+          $create_relation_table = "CREATE  TABLE IF NOT EXISTS  `mlt_" . $fieldValues['entity'] . "_" . $fieldValues['field_name'] . "` (
+              `vocab_number` VARCHAR(14) NOT NULL ,
+              `record_number` VARCHAR(45) NOT NULL ,
+              PRIMARY KEY (`vocab_number`, `record_number`) ,
+                FOREIGN KEY (`vocab_number` )
+                REFERENCES  `" . $fieldValues['field_name'] . "` (`vocab_number` )
+                ON DELETE RESTRICT
+                ON UPDATE CASCADE,
+                FOREIGN KEY (`record_number` )
+                REFERENCES  `" . $fieldValues['entity'] . "` (`" . get_primary_key($fieldValues['entity']) . "` )
+                ON DELETE CASCADE
+                ON UPDATE CASCADE)ENGINE = InnoDB;";
+          $dbQuery->ExecuteNonQuery($create_relation_table);
+
+          $create_entity = "INSERT INTO `gacl_axo` (`section_value`, `value`, `order_value`, `name`, `hidden`) VALUES('entities', '". $fieldValues['field_name'] . "', 15, '". $fieldValues['field_label'] . "', 0)";
+          $dbQuery->ExecuteNonQuery($create_entity);
+          $permisions = "INSERT INTO  `OpenEvSys`.`gacl_axo_map` (`acl_id` ,`section_value` ,`value`) VALUES ('19',  'entities', '". $fieldValues['field_name'] . "')";
+          $dbQuery->ExecuteNonQuery($permisions);
+        }
+        if (($fieldValues['field_type'] == "mt_tree" || $fieldValues['field_type'] == "mt_select") && $fieldValues['is_repeat'] == 'y') {
             $mtIndex = new MtIndex();
             $mt_term = $mtIndex->getTermforCode($fieldValues['list_code']);
 
@@ -407,7 +399,7 @@ function form_customization_add_field($field_type_options) {
                   ON UPDATE CASCADE)ENGINE = InnoDB;";
             $dbQuery->ExecuteNonQuery($sql);
         }if ($fieldValues['field_type'] == "user_select" && $fieldValues['is_repeat'] == 'y') {
-           
+
             $sql = "CREATE  TABLE IF NOT EXISTS  `mlt_" . $fieldValues['entity'] . "_" . $fieldValues['field_name'] . "` (
                 `username` VARCHAR(255) NOT NULL ,
                 `record_number` VARCHAR(45) NOT NULL ,
@@ -421,7 +413,7 @@ function form_customization_add_field($field_type_options) {
                   ON DELETE CASCADE
                   ON UPDATE CASCADE)ENGINE = InnoDB;";
            $dbQuery->ExecuteNonQuery($sql);
-            
+
         } elseif($fieldValues['field_type'] != "line") {
             $dbQuery->ExecuteNonQuery("ALTER TABLE `" . $fieldValues['entity'] . "` ADD `" . $fieldValues['field_name'] . "` $field_mysql_type ");
         }
@@ -455,7 +447,7 @@ function form_customization_field_number_exists($field_number) {
 function form_customization_update_help($post, $entity) {
     global $global;
     global $conf;
-     
+
     $records = Browse::getFieldsIds($entity);
     //var_dump($records);
     include_once(APPROOT . 'inc/i18n/lib_l10n.inc');
@@ -466,7 +458,7 @@ function form_customization_update_help($post, $entity) {
         $recordNumber = $record['field_number'];
         foreach ($locales as $code => $loc) {
             $dataArray = array();
-            
+
             foreach ($helpsubs as $sub) {
                 if (isset($_POST[$sub . '_' . $recordNumber]) && is_array($_POST[$sub . '_' . $recordNumber])) {
                     $labels = $_POST[$sub . '_' . $recordNumber];
@@ -491,4 +483,3 @@ function form_customization_update_help($post, $entity) {
         }
     }
 }
-
