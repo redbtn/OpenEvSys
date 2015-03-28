@@ -395,7 +395,7 @@ function form_customization_add_field($field_type_options) {
         } elseif($fieldValues['field_type'] != "line") {
             $dbQuery->ExecuteNonQuery("ALTER TABLE `" . $fieldValues['entity'] . "` ADD `" . $fieldValues['field_name'] . "` $field_mysql_type ");
         }
-        
+
         $dbQuery->ExecuteNonQuery($sql);
     } catch (Exception $e) {
         var_dump($e,$sql);exit;

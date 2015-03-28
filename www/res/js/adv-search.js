@@ -39,8 +39,8 @@ $.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
 
 /* Bootstrap style pagination control */
 $.extend( $.fn.dataTableExt.oPagination, {
-    "bootstrap": {
-        "fnInit": function( oSettings, nPaging, fnDraw ) {
+    bootstrap: {
+        fnInit: function( oSettings, nPaging, fnDraw ) {
             var oLang = oSettings.oLanguage.oPaginate;
             var fnClickHandler = function ( e ) {
                 e.preventDefault();
@@ -57,14 +57,14 @@ $.extend( $.fn.dataTableExt.oPagination, {
                 );
             var els = $('a', nPaging);
             $(els[0]).bind( 'click.DT', {
-                action: "previous"
+                action: 'previous'
             }, fnClickHandler );
             $(els[1]).bind( 'click.DT', {
-                action: "next"
+                action: 'next'
             }, fnClickHandler );
         },
 
-        "fnUpdate": function ( oSettings, fnDraw ) {
+        fnUpdate: function ( oSettings, fnDraw ) {
             var iListLength = 5;
             var oPaging = oSettings.oInstance.fnPagingInfo();
             var an = oSettings.aanFeatures.p;
@@ -161,7 +161,7 @@ openevsysDomain.getInstance = function(){
     if (openevsysDomain.instance == null) {
         openevsysDomain.instance = new openevsysDomain();
     }
-    return openevsysDomain.instance; 
+    return openevsysDomain.instance;
 }
 
 function openevsysDomain()
@@ -188,6 +188,10 @@ function openevsysDomain()
         'killing':['involvement','victim','perpetrator'],
         'destruction':['involvement','victim','perpetrator']
     }
+
+    $.getJSON("index.php?mod=analysis&act=entity_relations",function(relations){
+      this.er = relations;
+    }.bind(this));
 
     this.setSelectField = function(entity, field){
         try{
@@ -237,7 +241,7 @@ function openevsysDomain()
             if(this.data[entity].ac_type != null)
                 entity = this.data[entity].ac_type;
         }catch(e){}
-        return this.data[entity].fields; 
+        return this.data[entity].fields;
     }
 
     this.getRelatedEntities = function(entities){
@@ -301,14 +305,18 @@ function openevsysDomain()
             if(this.data[entity].ac_type != null)
                 entity = this.data[entity].ac_type;
         }catch(e){}
-        var fields = this.data[entity].fields;
+
+
         if(this.data[entity].select != null)
             return this.data[entity].select;
+
         var arr = new Array();
+        var fields = this.data[entity].fields;
         for(var i in fields){
             if(fields[i].select == 'y')
                 arr.push(fields[i].value);
         }
+
         this.data[entity].select = arr;
         return arr;
     }
@@ -491,16 +499,16 @@ function openevsysDomain()
                 }
                 ];
         }
-        return o; 
+        return o;
     }
-}/*}}}*/
+}
 
 /*{{{ Group by class */
 groupBy.getInstance = function(){
     if (groupBy.instance == null) {
         groupBy.instance = new groupBy();
     }
-    return groupBy.instance; 
+    return groupBy.instance;
 }
 
 
@@ -519,36 +527,36 @@ function groupBy(){
                 var e = query.group_by[c];
                 var select = $("<select id=\"\" name=\"\" class=\"entselectgroup\" />");
                 $("<option />", {
-                    value:  e.entity, 
+                    value:  e.entity,
                     text: od.getEntityLabel(e.entity)
                 }).appendTo(select);
-          
+
                 var div = $("<div class='row-fluid show-grid'></div>");
                 div.append(select);
                 $('#query_builder_count').append(div);
                 select.select2({
                     width: 'resolve'
                 });
-               
-                
-                
+
+
+
                 var select = $("<select id=\"\" name=\""+e.entity+"\" class=\"fieldselectgroup\" />");
                 $("<option />", {
-                    value:  e.field, 
+                    value:  e.field,
                     text: od.getFieldLabel(e.field , e.entity)
                 }).appendTo(select);
-        
-              
+
+
                 div.append(select);
-                
+
                 $(".entselectgroup").select2("disable");
                 $(".fieldselectgroup").select2("disable");
                 select.select2({
                     width: 'resolve'
                 });
-        
+
                 var field_type = od.getFieldType(e.field, e.entity);
-                
+
                 switch(field_type){
                     case "date":
                         var dck = (e.type == 'daily')?' selected="true" ' : '' ;
@@ -568,7 +576,7 @@ function groupBy(){
                         var o4ck = (e.type == '4')?' selected="true" ' : '' ;
                         var o5ck = (e.type == '5')?' selected="true" ' : '' ;
                         var o6ck = (e.type == '6')?' selected="true" ' : '' ;
-                       
+
                         var selectt = $('<select id="" name="" class=" searchval qb-count-type typeselectgroup"><option value="1" '+o1ck+'>'+_('1ST_LEVEL')+'</option><option value="2" '+o2ck+'>'+_('2ND_LEVEL')+'</option><option value="3" '+o3ck+'>'+_('3RD_LEVEL')+'</option><option value="4" '+o4ck+'>'+_('4TH_LEVEL')+'</option><option value="5" '+o5ck+'>'+_('5TH_LEVEL')+'</option><option value="6" '+o6ck+'>'+_('6TH_LEVEL')+'</option></select>');
                         div.append(selectt);
                         selectt.select2({
@@ -576,15 +584,15 @@ function groupBy(){
                         });
                         break;
                 }
-                
+
                 var but = $("<div class='closediv' style='margin-top: 7px;'><a href='#' title='"+_('REMOVE_CONDITION')+"'  ><i class='icon-remove'></i></a></div>");
                 div.append(but);
-       
+
                 $('#query_builder_count .closediv a').click(function(e){
                     e.preventDefault();
                     var div = $(this).closest("div.row-fluid");
                     div.remove();
-           
+
                     var divlast = $('#query_builder_count').find('div.row-fluid:last')
                     var entity = divlast.find('select.entselectgroup:first').val();
                     if(entity == null || entity == "" ){
@@ -592,16 +600,16 @@ function groupBy(){
                         qbg = groupBy.getInstance(null);
                         qbg.addNewCondition();
                     }
-            
+
                 });
-                
+
             }
-            this.addNewCondition();            
+            this.addNewCondition();
             $('#qb-search-but').data('type','count')
             $('#qb-search-but').html('<i class="icon-ok"></i> '+_('COUNT'));
             $('#collapseCount').collapse('show');
-            
-        
+
+
         }
         else{
             this.update();
@@ -625,7 +633,7 @@ function groupBy(){
             newarr.remove();
             this.addNewCondition();
         }
-        
+
     }
 
     this.removeCondition = function(e){
@@ -650,22 +658,22 @@ function groupBy(){
 
     this.addNewCondition = function(){
         var options = openevsysDomain.getInstance().getEntities(queryBuilder.getInstance().getSelectedEntities());
-        
+
         var select = $("<select id=\"\" name=\"\" class=\"entselectgroup\" />");
         $("<option />", {
-            value:  "", 
+            value:  "",
             text: ""
         }).appendTo(select);
-          
+
         for(var option in options){
             $("<option />", {
-                value:  options[option].value, 
+                value:  options[option].value,
                 text: options[option].label
             }).appendTo(select);
- 
+
         }
         var div = $("<div class='row-fluid show-grid new'></div>");
-         
+
         div.append(select);
         $('#query_builder_count').append(div);
         select.select2({
@@ -673,69 +681,69 @@ function groupBy(){
             placeholder: _('SELECT_ENTITY'),
             allowClear:false
         });
-        select.on("change", function() { 
+        select.on("change", function() {
             //alert($(this).val());
             qbg = groupBy.getInstance(null);
             qbg.addFieldSelect($(this));
         //groupBy.getInstance().update();
         });
-       
+
     }
 
 
     this.addFieldSelect = function(entselect){
         $(".entselectgroup").select2("disable");
-        
+
         var options = openevsysDomain.getInstance().getEntityFields(entselect.val());
-       
+
         var select = $("<select id=\"\" name=\""+entselect.val()+"\" class=\"fieldselectgroup\" />");
         $("<option />", {
-            value:  "", 
+            value:  "",
             text: ""
         }).appendTo(select);
-        
+
         for(var option in options){
             $("<option />", {
-                value:  options[option].value, 
+                value:  options[option].value,
                 text: options[option].label
             }).appendTo(select);
-       
+
         }
         var div = $(entselect).closest("div");
         div.append(select);
         $(div).removeClass('new');
-        
+
         $(".entselectgroup").select2("disable");
         select.select2({
             width: 'resolve',
             placeholder: _('SELECT_FIELD')
         });
-        select.on("change", function() { 
+        select.on("change", function() {
             //alert($(this).val());
             qbg = groupBy.getInstance(null);
             qbg.addField($(this));
         });
-        
-       
-        
+
+
+
     }
 
     this.addField = function(fieldselect){
         $(".fieldselectgroup").select2("disable");
         this.addController(fieldselect);
-        
+
         this.addNewCondition();
-       
+
     }
 
     this.getGroupBy = function(){
         var g = new Array();
-       
+
         var arr = $('#query_builder_count').find('.row-fluid');
         $.each(arr ,function(){
             if($(this).attr('data-status')=='new')return true;
             var c = new Object();
-            
+
             c.entity = $(this).find('select.entselectgroup:first').val();
             c.field = $(this).find('select.fieldselectgroup:first').val();
             if(c.entity == "" || c.field == ""){
@@ -745,89 +753,89 @@ function groupBy(){
             g.push(c);
         });
         return g;
-       
+
     }
 
     this.addController = function(fieldselect){
         var div = $(fieldselect).closest("div");
         //var entity = div.find(".entselect");
         var entity_name = fieldselect.attr("name");
-        
+
         var field_name = fieldselect.val();
-        
+
         var od = openevsysDomain.getInstance();
         var field_type = od.getFieldType(field_name, entity_name);
         var options = openevsysDomain.getInstance().getOperator(field_type);
-               
+
         switch(field_type){
             case "date":
-          
+
                 var select = $("<select id=\"\" name=\"\" class=\"select searchval qb-count-type typeselectgroup\" />");
-               
+
                 $("<option />", {
-                    value:  "daily", 
+                    value:  "daily",
                     text: _('GROUP_BY_DAY')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "monthly", 
+                    value:  "monthly",
                     text: _('GROUP_BY_MONTHLY')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "yearly", 
+                    value:  "yearly",
                     text: _('GROUP_BY_YEARLY')
                 }).appendTo(select);
-                
+
                 div.append(select);
                 select.select2({
                     width: 'resolve'
                 });
-               
+
                 break;
             case "mt_tree":
                 break;
                 var select = $("<select id=\"\" name=\"\" class=\"select searchval qb-count-type typeselectgroup\" />");
-               
+
                 $("<option />", {
-                    value:  "1", 
+                    value:  "1",
                     text: _('1ST_LEVEL')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "2", 
+                    value:  "2",
                     text: _('2ND_LEVEL')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "3", 
+                    value:  "3",
                     text: _('3RD_LEVEL')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "4", 
+                    value:  "4",
                     text: _('4TH_LEVEL')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "5", 
+                    value:  "5",
                     text: _('5TH_LEVEL')
                 }).appendTo(select);
                 $("<option />", {
-                    value:  "6", 
+                    value:  "6",
                     text: _('6TH_LEVEL')
                 }).appendTo(select);
-                
+
                 div.append(select);
                 select.select2({
                     width: 'resolve'
                 });
-                
-               
+
+
                 break;
         }
         var but = $("<div class='closediv' style='margin-top: 7px;'><a href='#' title='"+_('REMOVE_CONDITION')+"'  ><i class='icon-remove'></i></a></div>");
         div.append(but);
-       
+
         $('#query_builder_count .closediv a').click(function(e){
             e.preventDefault();
             var div = $(this).closest("div.row-fluid");
             div.remove();
-           
+
             var divlast = $('#query_builder_count').find('div.row-fluid:last')
             var entity = divlast.find('select.entselectgroup:first').val();
             if(entity == null || entity == "" ){
@@ -835,16 +843,16 @@ function groupBy(){
                 qbg = groupBy.getInstance(null);
                 qbg.addNewCondition();
             }
-            
+
         });
-        
-     
+
+
     }
 }/*}}}*/
 
 /*{{{ Query Builder */
 
-//singleton 
+//singleton
 queryBuilder.getInstance = function(){
     if (queryBuilder.instance == null) {
         queryBuilder.instance = new queryBuilder();
@@ -867,7 +875,7 @@ queryBuilder.createDate = function(element, mode){
             registerDate.val(formated);
         }
     };
-    if(mode != null) 
+    if(mode != null)
         options.mode = mode;
     element.DatePicker(options);
 }
@@ -891,60 +899,60 @@ function queryBuilder(){
             var e = query.conditions[c];
             var field_name = e.field;
             var entity_name = e.entity;
-            
+
             var entselect = $("<select id=\"\" name=\"\" class=\"entselect\" />");
             $("<option />", {
-                value:  entity_name, 
+                value:  entity_name,
                 text: od.getEntityLabel(entity_name)
             }).appendTo(entselect);
- 
+
             var div = $("<div class='row-fluid show-grid'></div>");
             div.append(entselect);
             $('#query_builder').append(div);
             entselect.select2({
                 width: 'resolve'
             }).select2("disable");
-        
+
             var fieldselect = $("<select id=\"\" name=\""+entity_name+"\" class=\"fieldselect\" />");
             $("<option />", {
-                value:  field_name, 
+                value:  field_name,
                 text: od.getFieldLabel(field_name , entity_name)
             }).appendTo(fieldselect);
-       
-        
+
+
             div.append(fieldselect);
-        
+
             fieldselect.select2({
                 width: 'resolve'
             }).select2("disable");
-    
-        
+
+
             var field_type = od.getFieldType(field_name, entity_name);
-        
+
             var options = openevsysDomain.getInstance().getOperator(field_type);
-               
+
             var operatorselect = $("<select id=\"\" name=\"\" class=\"operatorselect\" />");
             for(var option in options){
                 $("<option />", {
-                    value:  options[option].value, 
+                    value:  options[option].value,
                     text: options[option].label
                 }).appendTo(operatorselect);
-                
+
             }
-       
+
             div.append(operatorselect);
-                    
+
             operatorselect.val( e.operator ).attr('selected',true);
             operatorselect.select2({
                 width: 'resolve'
             });
-            
-            
+
+
             if(field_type == 'date'){
-                operatorselect.on("change", function() { 
+                operatorselect.on("change", function() {
                     var ov = $(this).val();
                     var d = $(this).parent().find('.dateselect')
-                
+
                     if( ov == 'between' || ov == 'not_between'){
                         var o = $('<input type="text" value="" class="daterangepickerinput searchval dateselect" />');
                         //div.append(o);
@@ -959,12 +967,12 @@ function queryBuilder(){
                         o.datepicker({
                             format:'yyyy-mm-dd'
                         });
-                
+
                     }
                     d.replaceWith(o)
                 });
             }
-            
+
             switch(field_type){
                 case "date":
                     if( e.operator == 'between' || e.operator == 'not_between'){
@@ -984,7 +992,7 @@ function queryBuilder(){
                             format:'yyyy-mm-dd'
                         });
                     }
-               
+
                     break;
                 case "mt_select":
                     var mt_select = $("<select id=\"\" name=\"\" class=\"select searchval\" data-val=\""+e.value+"\" />");
@@ -995,11 +1003,11 @@ function queryBuilder(){
                     });
                     div.append(mt_select);
                     //mt_select.val( e.value ).attr('selected',true);
-            
+
                     mt_select.select2({
                         width: 'resolve'
                     });
-                    
+
                     //mt_select.select2("val",e.value);
                     break;
                 case "mt_tree":
@@ -1010,7 +1018,7 @@ function queryBuilder(){
                     });
                     div.append(mt_tree);
                     //mt_tree.val( e.value ).attr('selected',true);
-            
+
                     mt_tree.select2({
                         width: 'resolve',
                         formatResult: format_mt_tree,
@@ -1021,7 +1029,7 @@ function queryBuilder(){
                     var name = genName();
                     var yesck = (e.value == 'y')?" checked='true' " : "" ;
                     var nock = (e.value == 'n')?" checked='true' " : "" ;
-                 
+
                     var o = $("<label class='radio inline'><input type='radio' class='searchval-radio-yes' name='"+name+"' value='y' "+yesck+" />"+_('YES')+"</label><label class='radio inline'><input class='searchval-radio-no' type='radio' name='"+name+"' value='n' "+nock+"  />"+_('NO')+"</label>");
                     div.append(o);
                     break;
@@ -1031,7 +1039,7 @@ function queryBuilder(){
                     }else {
                         var chked = '';
                     }
-                   
+
                     var o = $('<label class="checkbox inline"><input class="searchval-checkbox" type="checkbox" '+chked+' name="deceased"/></label>');
                     div.append(o);
                     break;
@@ -1039,15 +1047,15 @@ function queryBuilder(){
                     var o = $('<input type="text" value="" class="searchval" />');
                     o.val(e.value);
                     div.append(o);
-                
+
             }
-            
+
             if( e.link != null ){
                 this.addAndOperater(div, e.link);
             }else{
                 this.addAndOperater(div);
             }
-            
+
         }
         this.addNewCondition();
         groupBy.getInstance().setQuery(query);
@@ -1061,19 +1069,19 @@ function queryBuilder(){
 
     this.addNewCondition = function(){
         var options = openevsysDomain.getInstance().getRelatedEntities(this.getSelectedEntities());
-        
+
         var select = $("<select id=\"\" name=\"\" class=\"entselect\" />");
         $("<option />", {
-            value:  "", 
+            value:  "",
             text: ""
         }).appendTo(select);
-          
+
         for(var option in options){
             $("<option />", {
-                value:  options[option].value, 
+                value:  options[option].value,
                 text: options[option].label
             }).appendTo(select);
- 
+
         }
         var div = $("<div class='row-fluid show-grid'></div>");
         div.append(select);
@@ -1083,15 +1091,15 @@ function queryBuilder(){
             placeholder: _('SELECT_ENTITY'),
             allowClear:false
         });
-        select.on("change", function() { 
+        select.on("change", function() {
             //alert($(this).val());
             qb = queryBuilder.getInstance(null);
             qb.addFieldSelect($(this));
-            
+
         });
         return;
-        
-       
+
+
     }
 
     this.removeCondition = function(e){
@@ -1117,38 +1125,38 @@ function queryBuilder(){
 
     this.addFieldSelect = function(entselect){
         var options = openevsysDomain.getInstance().getEntityFields(entselect.val());
-       
+
         var select = $("<select id=\"\" name=\""+entselect.val()+"\" class=\"fieldselect\" />");
         $("<option />", {
-            value:  "", 
+            value:  "",
             text: ""
         }).appendTo(select);
-        
+
         for(var option in options){
             $("<option />", {
-                value:  options[option].value, 
+                value:  options[option].value,
                 text: options[option].label
             }).appendTo(select);
-       
+
         }
         var div = $(entselect).closest("div");
         div.append(select);
-        
+
         $(".entselect").select2("disable");
         select.select2({
             width: 'resolve',
             placeholder: _('SELECT_FIELD')
         });
-        select.on("change", function() { 
+        select.on("change", function() {
             //alert($(this).val());
             qb = queryBuilder.getInstance(null);
             qb.addField($(this));
             groupBy.getInstance().update();
         });
-        
-        
+
+
         return;
-        	
+
     }
 
     this.addField = function(fieldselect){
@@ -1156,39 +1164,39 @@ function queryBuilder(){
         this.addController(fieldselect);
         this.addNewCondition();
         return;
-       
+
     }
 
     this.addController = function(fieldselect){
         var div = $(fieldselect).closest("div");
         //var entity = div.find(".entselect");
         var entity_name = fieldselect.attr("name");
-        
+
         var field_name = fieldselect.val();
-        
+
         var od = openevsysDomain.getInstance();
         var field_type = od.getFieldType(field_name, entity_name);
-        
+
         var options = openevsysDomain.getInstance().getOperator(field_type);
-               
+
         var select = $("<select id=\"\" name=\"\" class=\"operatorselect\" />");
-        
+
         for(var option in options){
             $("<option />", {
-                value:  options[option].value, 
+                value:  options[option].value,
                 text: options[option].label
             }).appendTo(select);
         }
-       
+
         div.append(select);
         select.select2({
             width: 'resolve'
         });
         if(field_type == 'date'){
-            select.on("change", function() { 
+            select.on("change", function() {
                 var ov = $(this).val();
                 var d = $(this).parent().find('.dateselect')
-                
+
                 if( ov == 'between' || ov == 'not_between'){
                     var o = $('<input type="text" value="" class="daterangepickerinput searchval dateselect" />');
                     //div.append(o);
@@ -1203,7 +1211,7 @@ function queryBuilder(){
                     o.datepicker({
                         format:'yyyy-mm-dd'
                     });
-                
+
                 }
                 d.replaceWith(o)
             });
@@ -1215,8 +1223,8 @@ function queryBuilder(){
                 o.datepicker({
                     format:'yyyy-mm-dd'
                 });
-               
-               
+
+
                 break;
             case "mt_select":
                 var mt_select = $("<select id=\"\" name=\"\" class=\"select searchval\" />");
@@ -1228,7 +1236,7 @@ function queryBuilder(){
                 mt_select.select2({
                     width: 'resolve'
                 });
-               
+
                 break;
             case "mt_tree":
                 var mt_tree = $('<select id=\"\" name=\"\" class=\"mt-tree select searchval\" />');
@@ -1255,11 +1263,11 @@ function queryBuilder(){
                 var o = $('<input type="text" value="" class="searchval" />');
                 div.append(o);
         }
-        
+
         this.addAndOperater(div);
-        
+
         return;
-  
+
     }
 
     this.addAndOperater = function(div , value){
@@ -1276,46 +1284,46 @@ function queryBuilder(){
         ];
         var select = $("<select id=\"\" name=\"\" class=\"operselect\" />");
         for(var i in options){
-                   
+
             $("<option />", {
-                value:  options[i].value, 
+                value:  options[i].value,
                 text: options[i].label
             }).appendTo(select);
-            
+
         }
         //var div = $(sel).closest("div");
         div.append(select);
         select.val( value ).attr('selected',true);
-            
+
         //$('#query_builder').append(div);
         select.select2({
             width: 'resolve'
         });
-        
+
         var but = $("<div class='closediv'><a href='#' title='"+_('REMOVE_CONDITION')+"' ><i class='icon-remove'></i></a></div>");
         div.append(but);
-       
+
         $('#query_builder .closediv a').click(function(e){
             e.preventDefault();
             var div = $(this).closest("div.row-fluid");
             div.remove();
-           
+
             var divlast = $('#query_builder').find('div.row-fluid:last')
             var entity = divlast.find('select.entselect:first').val();
             if(entity == null || entity == "" ){
                 divlast.remove();
                 qb = queryBuilder.getInstance(null);
-           
+
                 qb.addNewCondition();
             }
-            
+
             groupBy.getInstance().update();
         });
-        
+
         return;
-        
-        
-       
+
+
+
     }
 
     this.clearConditions = function(){
@@ -1336,8 +1344,8 @@ function queryBuilder(){
             }
         });
         return entities;
-        
-       
+
+
     }
 
     this.getQuery = function(){
@@ -1347,7 +1355,7 @@ function queryBuilder(){
         $.each(arr ,function(){
             if($(this).attr('data-status')=='new')return true;
             var c = new Object();
-            
+
             c.entity = $(this).find('select.entselect:first').val();
             c.field = $(this).find('select.fieldselect:first').val();
             if(c.entity == "" || c.field == ""){
@@ -1362,7 +1370,7 @@ function queryBuilder(){
             }else{
                 c.value = $(this).find('.searchval:first').val();
             }
-            
+
             //handle checkboxes
             if($(this).find('.searchval-checkbox').length > 0 ){
                 if($(this).find('.searchval-checkbox').is(':checked'))
@@ -1380,20 +1388,20 @@ function queryBuilder(){
                     c.value = 'n';
             }
             c.link = $(this).find('select.operselect:first').val();
-            
+
             conditions.push(c);
         });
 
         //display select variables
         var select = new Array();
         var entities = this.getSelectedEntities();
-        
+
         for(var i in entities){
             var fields = openevsysDomain.getInstance().getSelectFields(entities[i]);
-            
+
             for(var f in fields){
                 var field = {
-                    'entity': entities[i], 
+                    'entity': entities[i],
                     'field': fields[f]
                 }
                 select.push(field)
@@ -1403,8 +1411,8 @@ function queryBuilder(){
         var query = new Object();
         query.conditions = conditions;
         query.select = select;
-        
-        
+
+
         return query;
     }
 }/*}}}*/
@@ -1414,7 +1422,7 @@ advSearch.getInstance = function(){
     if (advSearch.instance == null) {
         advSearch.instance = new advSearch();
     }
-    return advSearch.instance; 
+    return advSearch.instance;
 }
 
 /* Advance search class */
@@ -1424,7 +1432,7 @@ function advSearch(){
     this.group_by = null;
     this.additional_fields = new Array();
     this.oTable = null;
-    
+
     this.setQuery = function(query){
         this.query_builder.setQuery(query);
     }
@@ -1436,14 +1444,14 @@ function advSearch(){
     }
     this.initAdditionalFieldsList = function (){
         var entities = queryBuilder.getInstance().getSelectedEntities();
-        
+
         var obj = openevsysDomain.getInstance();
         var fieldSet = 0;
         var list = "<ul>";
         for(var count=0;entities.length > count;count++)
         {
             var fields = obj.getEntityFields(entities[count]);
-            
+
             list += "<li><a href='#'>"+obj.getEntityLabel(entities[count])+"</a><ul>";
             for(var key in fields)
             {
@@ -1453,16 +1461,16 @@ function advSearch(){
                 //console.log(key);
                 for(countIn = 0;this.query.select.length > countIn; countIn++)
                 {
-					
+
                     if(this.query.select[countIn].entity == entities[count] && this.query.select[countIn].field ==fields[key].value)
                     {
-						
+
                         fieldSet = 1;
                         break;
                     }
                     else
                     {
-						
+
                         fieldSet = 0;
                     }
                 }
@@ -1471,10 +1479,10 @@ function advSearch(){
                     list += "<li><a href='#' data-field='"+key+"' data-entity='"+entities[count]+"'>"+fields[key].label+"</a></li>";
                     fieldSet = 0;
                 }
-				
+
             }
             list += "</ul></li>";
-			
+
         }
         list +="</ul>";
         $("div.toolbar #news-items").html(list)
@@ -1485,97 +1493,38 @@ function advSearch(){
             crumbDefaultText: ' ',
             callerOnState: ''
         });
-		
+
         $('div.toolbar #hierarchybreadcrumb').menu({
             content: $('div.toolbar #hierarchybreadcrumb').next().html(),
             backLink: false,
             callerOnState: ''
         });
-    /*
-        *  //console.log(this.query.select[0].entity);
-        var select = $("<select id=\"\" name=\"\" class=\"addfieldselect\" multiple=\"multiple\"  />");
-        /*$("<option />", {
-            value:  "", 
-            text: ""
-        }).appendTo(select);*/
-    
-    /*for(var count=0;entities.length > count;count++)
-        {
-            var fields = obj.getEntityFields(entities[count]);
-            var optGroup  = $("<optGroup />", {
-                label:  obj.getEntityLabel(entities[count])
-            });
-            for(var key in fields)
-            {
-                //console.log(key);
-                for(countIn = 0;this.query.select.length > countIn; countIn++)
-                {
-					
-                    if(this.query.select[countIn].entity == entities[count] && this.query.select[countIn].field ==fields[key].value)
-                    {
-						
-                        fieldSet = 1;
-                        break;
-                    }
-                    else
-                    {
-						
-                        fieldSet = 0;
-                    }
-                }
-                if(fieldSet != 1)
-                {
-                    var option =  $("<option />", {
-                        value:  key, 
-                        text: fields[key].label
-                    })
-                    option.data('field',key);
-                    option.data('entity',entities[count]);
-                    option.appendTo(optGroup);
-                    //list += "<li><a href='#' data-field='"+key+"' data-entity='"+entities[count]+"'>"+fields[key].label+"</a></li>";
-                    fieldSet = 0;
-                }
-				
-            }
-            optGroup.appendTo(select);
-            
-			
-        }
-        
-        $("#addfieldselectbox").append(select);
-        select.select2({
-            width: 'resolve',
-            closeOnSelect:false,
-            placeholder: _('ADD_FIELDS_TO_SEARCH_RESULTS'),
-            allowClear:false
-        });*/
-        
     }
-	
-	
+
+
     this.addField = function(field , entity){
         openevsysDomain.getInstance().setSelectField(entity,field);
         this.Search();
         return;
-        
-		
+
+
     }
     this.removeField = function(field , entity){
         openevsysDomain.getInstance().unsetSelectField(entity,field);
         this.Search();
         return;
-        
-		
+
+
     }
-	
-	
+
+
     this.Search = function(){
         this.query = this.query_builder.getQuery();
-        
+
         if(this.query.conditions < 1 ){
             $.pnotify({
-                pnotify_title: 'Error', 
-                pnotify_text: _('PLEASE_ADD_A_CONDITION_BEFORE_SEARCH_'), 
+                pnotify_title: 'Error',
+                pnotify_text: _('PLEASE_ADD_A_CONDITION_BEFORE_SEARCH_'),
                 pnotify_type: 'error'
             });
             return;
@@ -1584,30 +1533,30 @@ function advSearch(){
 
     }
     this.fetchResultsAndDisplay = function(stype){
-        
+
         this.query = this.query_builder.getQuery();
         if(this.query.conditions < 1 ){
-           
+
             return;
         }
-        
+
         od = openevsysDomain.getInstance();
         var columns = new Array();
-            
+
         if(stype == "count"){
             this.query.group_by = this.group_by.getGroupBy();
-       
+
             for (var i = 0; i < this.query.group_by.length; i++) {
                 var sel = this.query.group_by[i];
                 var column = new Object();
                 column.mData = sel.entity+"_"+sel.field
                 column.sTitle = od.getFieldLabel(sel.field ,sel.entity);
-                
+
                 column.entity = sel.entity;
                 column.field = sel.field;
                 columns.push(column);
-            } 
-             
+            }
+
             var column = new Object();
             column.mData = "count"
             column.sTitle = _('COUNT');
@@ -1647,29 +1596,29 @@ function advSearch(){
             "sAjaxSource": "index.php?mod=analysis&act=load_grid&query="+encodeURI($.toJSON(this.query)),
             "aoColumns":columns
         };
-        
+
         this.oTable = $('#datatable').dataTable( settings);
-        
+
         $("div.toolbar").html($("#toolbar2").html());
         $("#toolbar2").hide();
         this.initAdditionalFieldsList();
         this.updateToolBar();
 
         //oTable.fnAdjustColumnSizing();
-        
+
         $('#datatable th').each( function (i) {
             $(this).html($(this).html()+" <a href='' title='remove column'  onclick='return removeField(\""+columns[i].field+"\",\""+columns[i].entity+"\")'>x</a>");
         } );
         $('#qb-qs-save').click(function(){
-            
+
             $('#query-name').text($('#query_name').val());
             var q = queryBuilder.getInstance().getQuery()
             q.group_by = groupBy.getInstance().getGroupBy();
-        
+
             $.get($('#qb-save-query').attr('action')+'&stream=text', {
-                'query':$.toJSON(q), 
-                'query_desc':$('#query_desc').val(), 
-                'query_name':$('#query_name').val(), 
+                'query':$.toJSON(q),
+                'query_desc':$('#query_desc').val(),
+                'query_name':$('#query_name').val(),
                 'query_save':true
             }, function(data){
                 $('#query_desc').val('');
@@ -1684,11 +1633,11 @@ function advSearch(){
     this.Count = function(){
         this.query = this.query_builder.getQuery();
         this.query.group_by = this.group_by.getGroupBy();
-        
+
         if(this.query.group_by.length < 1 ){
             $.pnotify({
-                pnotify_title: 'Error', 
-                pnotify_text: _('PLEASE_ADD_A_CONDITION_INSIDE_THE_COUNT_BOX_TO_COUNT_'), 
+                pnotify_title: 'Error',
+                pnotify_text: _('PLEASE_ADD_A_CONDITION_INSIDE_THE_COUNT_BOX_TO_COUNT_'),
                 pnotify_type: 'error'
             });
             return;
@@ -1699,11 +1648,12 @@ function advSearch(){
     /* This function will initialise the advance search class */
     this.init = function(){
         this.group_by = groupBy.getInstance();
-        
+
         $(document).ready(function(){
             var domain = openevsysDomain.getInstance();
             domain.fetchDomainData(advSearch.initObjects);
         });
+
         this.query_builder = queryBuilder.getInstance();
         this.group_by = groupBy.getInstance();
         this.group_by.init();
@@ -1715,7 +1665,7 @@ function advSearch(){
             $('#qb-search-but').data('type','search')
             $('#qb-search-but').html('<i class="icon-ok"></i> '+_('SEARCH'))
         })
-        
+
         $('#qb-clear-but').click(function(){
             queryBuilder.getInstance().clearConditions();
             //groupBy.getInstance().clearConditions();
@@ -1737,13 +1687,13 @@ function advSearch(){
         domain.data = data;
         queryBuilder.getInstance().init();
         if(query != ''){
-            
+
             //var sr = searchResults.getInstance();
             var q = $.secureEvalJSON(query);
             //console.log(q)
-           
+
             as.setQuery(q);
-            
+
             if(q.group_by != null && q.group_by.length != 0){
                 as.fetchResultsAndDisplay("count");
             }else{
@@ -1753,12 +1703,12 @@ function advSearch(){
             //sr.fetchResultsAndDisplay();
             queryBuilder.getInstance().setQuery(q);
         }
-        
+
     }
 
-  
+
 }
-/*}}}*/
+
 
 var registerDate = null;
 var namenumber = 0;
@@ -1769,7 +1719,7 @@ function removeField(field,entity){
     var as = advSearch.getInstance();
     as.removeField(field,entity);
     return false;
-		
+
 }
 
 //Jquery plugin to fetch microthusari values
@@ -1786,7 +1736,7 @@ function removeField(field,entity){
             $(this).load( options.url+'&list_code='+options.mt+'&selected='+options.selected,function(){
                 if(options.selected){
                     $(this).val( options.selected ).attr('selected',true);
-            
+
                     $(this).select2("val",options.selected);
                 }
             } );
@@ -1818,13 +1768,13 @@ function removeField(field,entity){
             $(this).load( options.url+'&list_code='+options.mt+'&selected='+options.selected,function(){
                 if(options.selected){
                     $(this).val( options.selected ).attr('selected',true);
-            
+
                     $(this).select2("val",options.selected);
                 }
             } );
         });
-        
-        
+
+
 
         function debug($obj) {
             if (window.console && window.console.log) {
