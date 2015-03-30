@@ -327,6 +327,7 @@ function form_customization_add_field($field_type_options) {
             $fieldValues['is_repeat'] = 'y';
             $fieldValues['field_type'] = 'mt_select';
             $fieldValues['list_code'] = (int) $_POST['list_code'];
+            $field_mysql_type = "VARCHAR(14)";
             break;
         case 'user_select' :
              $fieldValues['visible_browse'] = 'n';
@@ -353,7 +354,6 @@ function form_customization_add_field($field_type_options) {
     $fieldValues['visible_edit'] = $fieldValues['visible_new'];
     $fieldValues['visible_search'] = $fieldValues['visible_browse'];
     $fieldValues['visible_search_display'] = $fieldValues['visible_browse'];
-
 
     $validated = true;
     if (!$fieldValues['entity'] || !$fieldValues['field_name'] || !$fieldValues['field_number']
@@ -391,7 +391,7 @@ function form_customization_add_field($field_type_options) {
             $dbQuery->ExecuteNonQuery("ALTER TABLE `" . $fieldValues['entity'] . "` ADD `" . $fieldValues['field_name'] . "_longitude` double NULL ");
         }if (($fieldValues['field_type'] == "mt_tree" || $fieldValues['field_type'] == "mt_select") && $fieldValues['is_repeat'] == 'y') {
             $mtIndex = new MtIndex();
-            $mt_term = $mtIndex->getTermforCode($fieldValues['list_code']);
+            $mt_term = trim($mtIndex->getTermforCode($fieldValues['list_code']));
 
             $sql = "CREATE  TABLE IF NOT EXISTS  `mlt_" . $fieldValues['entity'] . "_" . $fieldValues['field_name'] . "` (
                 `vocab_number` VARCHAR(14) NOT NULL ,
